@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="chinese (simplified)">
+<head>
+        <meta charset="utf-8" />
+        <title>深入解析dom4j</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">飘灵的个人博客 </a></h1>
+                <nav><ul>
+                    <li class="active"><a href="/category/dom4j.html">dom4j</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="/shen-ru-jie-xi-dom4j.html" rel="bookmark"
+           title="Permalink to 深入解析dom4j">深入解析dom4j</a></h1>
+    </header>
+
+    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2018-11-02T10:02:00+08:00">
+                Published: 周五 02 十一月 2018
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/fei-zhao.html">Fei Zhao</a>
+        </address>
+<p>In <a href="/category/dom4j.html">dom4j</a>.</p>
+<p>tags: <a href="/tag/dom4j.html">dom4j</a> </p>
+</footer><!-- /.post-info -->      <h1 id="dom4j">深入解析dom4j</h1>
+<h3 id="_1">——以面向对象的视角来看</h3>
+<p><strong>作者：赵飞</strong>                     <strong>更新日期：2018年11月1日</strong>            <strong>基于国科大面向对象程序设计课程</strong></p>
+<p><img alt="1541083192651" src="..\images\1541083192651.png"></p>
+<h2 id="part1dom4j">Part1：dom4j的功能与使用</h2>
+<ol>
+<li><strong><font color = blue>dom4j的简介</font></strong>
+本手册分析版本：<font color=blue>v2.1.1</font></li>
+</ol>
+<p>dom4j维护官网地址：<a href="http://dom4j.org">dom4j官网</a>，gihub仓库地址：<a href="https://github.com/dom4j/dom4j">gihub仓库</a></p>
+<p><strong>先看一个dom4j的官方释义</strong>：</p>
+<blockquote>
+<p>Dom4j is an easy to use, open source library for working with XML, XPath and XSLT on the Java platform using the Java Collections Framework and with full support for DOM, SAX and JAXP.</p>
+</blockquote>
+<p>是的，dom4j是一个<font color=green>开源</font>的、基于<font color=green>Java语言</font>的<font color=green>类库</font>。它专用于在Java平台上处理XML, XPath,XSLT等类型的文件（本手册仅关注于该类库在处理解析<strong>XML</strong>文件方面的作用）。这里不再赘述dom4j的各种优越性，我们只需要知道：dom4j是一个使用简单，执行高效的XML解析包，就连Sun公司的JAXM也在使用它解析XML文件。现今，dom4j已经成为jar包的一个标配。 </p>
+<ol start="2">
+<li><strong><font color = blue>dom4j的xml解析功能</font></strong></li>
+</ol>
+<p>dom4j，顾名思义，它就是支持对XML文件进行<strong>DOM操作</strong>的一个类库。那么什么是DOM操作呢？事实上，DOM操作就在我们每个人的日常生活中。你每天浏览网页（静态网页除外）其实就是在执行DOM操作。</p>
+<p>首先，我们先来看看XML文件的结构。众所周知，浏览器中的网页大多数都是由HTML语言（XML语法和HTML语法非常类似）描述的，例如下面就是我喜欢的一个wap网页游戏的部分首页<strong>HTML</strong>源代码：</p>
+<div class="highlight"><pre><span></span><span class="c">&lt;!--HTML文件结构--&gt;</span>
+<span class="cp">&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;</span>
+<span class="cp">&lt;!DOCTYPE html PUBLIC &quot;-//WAPFORUM//DTD XHTML Mobile 1.0//EN&quot; &quot;http://www.wapforum.org/DTD/xhtml-mobile10.dtd&quot;&gt;</span>
+<span class="p">&lt;</span><span class="nt">html</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">head</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">title</span><span class="p">&gt;</span>大话水浒<span class="p">&lt;/</span><span class="nt">title</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">script</span> <span class="na">src</span><span class="o">=</span><span class="s">&quot;http://203.195.129.90/html/js/wml2html.js&quot;</span><span class="p">&gt;&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">link</span> <span class="na">href</span><span class="o">=</span><span class="s">&quot;http://203.195.129.90/html/css/gamestyle.css&quot;</span> <span class="na">type</span><span class="o">=</span><span class="s">&quot;text/css&quot;</span> <span class="na">rel</span><span class="o">=</span><span class="s">&quot;stylesheet&quot;</span><span class="p">/&gt;</span>
+<span class="p">&lt;/</span><span class="nt">head</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">body</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">div</span> <span class="na">id</span><span class="o">=</span><span class="s">&quot;main_body&quot;</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">p</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">img</span> <span class="na">src</span><span class="o">=</span><span class="s">&quot;http://203.195.129.90/image/app/21/waterth/logo.png&quot;</span><span class="p">/&gt;</span>
+<span class="p">&lt;</span><span class="nt">br</span> <span class="p">/&gt;</span>
+帐号:
+<span class="p">&lt;</span><span class="nt">br</span> <span class="p">/&gt;</span>
+<span class="p">&lt;</span><span class="nt">input</span> <span class="na">name</span><span class="o">=</span><span class="s">&quot;username&quot;</span> <span class="na">type</span><span class="o">=</span><span class="s">&quot;text&quot;</span> <span class="na">value</span><span class="o">=</span><span class="s">&quot;&quot;</span><span class="p">/&gt;</span>
+<span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">body</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">html</span><span class="p">&gt;</span>
+</pre></div>
+
+
+<p>再来看看dom4j自带的一个示例<strong>XML</strong>文件<code>\dom4j-master\xml\test\journal.xml</code>： </p>
+<div class="highlight"><pre><span></span><span class="cp">&lt;?xml version=&quot;1.0&quot;?&gt;</span>
+
+<span class="nt">&lt;series</span> <span class="na">xmlns:xsi=</span><span class="s">&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span>
+          <span class="na">xsi:noNamespaceSchemaLocation=</span><span class="s">&quot;journal.xsd&quot;</span><span class="nt">&gt;</span>
+
+<span class="nt">&lt;entry&gt;</span>
+<span class="nt">&lt;date&gt;</span>May 19, 2002<span class="nt">&lt;/date&gt;</span>
+<span class="nt">&lt;text&gt;</span>
+Sample text. We should support some markup here.
+<span class="nt">&lt;/text&gt;</span>
+<span class="nt">&lt;/entry&gt;</span>
+
+<span class="nt">&lt;entry&gt;</span>
+<span class="nt">&lt;date&gt;</span>May 19, 2002 10:27<span class="nt">&lt;/date&gt;</span>
+<span class="nt">&lt;text&gt;</span>
+Second batch.
+<span class="nt">&lt;/text&gt;</span>
+<span class="nt">&lt;/entry&gt;</span>
+
+<span class="nt">&lt;/series&gt;</span>
+</pre></div>
+
+
+<p>可以看到，XML，HTML它们都由层次化的标签（tag）+内容（content）组成。例如在journal.xml中文档开头是<code>&lt;?xml version="1.0"?&gt;</code>，意在声明这是一个XML格式的文件。紧接着就是嵌套的多个元素（元素=tag+content）。在一个元素中，tag名描述了其中内容的含义、类型。例如其中的<code>&lt;date&gt;May 19, 2002 10:27&lt;/date&gt;</code>，标签名就是date（以&lt;&gt;包装为开始标签，以</>包装为结束标签），它表示这个元素的内容19,2002 10:27是一个日期（date）。</p>
+<ol start="3">
+<li>
+<p><strong><font color = blue>dom4j的大概组成</font></strong></p>
+</li>
+<li>
+<p><strong><font color = blue>dom4j的使用方法</font></strong></p>
+</li>
+</ol>
+<h2 id="part2dom4j">Part2：dom4j的核心类、对象、运作原理</h2>
+<h2 id="part3dom4j">Part3：dom4j的高级设计意图</h2>
+<h3 id="_2"><font color=red>最近实验多比较忙，敬请期待后续良心更新...</font></h3>
+    </div><!-- /.entry-content -->
+
+  </article>
+</section>
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>links</h2>
+                        <ul>
+                            <li><a href="http://getpelican.com/">Pelican</a></li>
+                            <li><a href="http://python.org/">Python.org</a></li>
+                            <li><a href="http://jinja.pocoo.org/">Jinja2</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+
+                            <li><a href="https://github.com/caopiaolingsky">github</a></li>
+                            <li><a href="#">QQ:2550688560</a></li>
+                            <li><a href="#">Eamil:2550688560@qq.com</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+</body>
+</html>
